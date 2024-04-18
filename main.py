@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 import os
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY')  # Set a secret key for session handling
+app.secret_key = os.getenv('SECRET_KEY')  # Set a secret key for session handling
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///visitors.db'  # Configure the database URI
 db = SQLAlchemy(app)
 
@@ -33,6 +33,14 @@ with app.app_context():
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    if 'authenticated' not in session:
+        # Prompt for password
+        password = request.form.get('password')
+        if password == os.getenv('SECRET_PASSWORD'):
+            session['authenticated'] = True
+            return redirect(url_for('upload_file'))
+        else:
+            return render_template('login.html')
     if request.method == 'POST':
         # Check if the file is present in the request
         if 'file' not in request.files:
