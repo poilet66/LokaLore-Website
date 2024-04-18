@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
 from PIL import Image
 import os
 
@@ -42,12 +41,9 @@ def upload_file():
         # If the user does not select a file, the browser submits an empty file without a filename
         if file.filename == '':
             return 'No selected file'
-        # Save the uploaded file
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
+
         # Process the image using your existing Python script
-        result = process_image(file_path, 30, 14)
+        result = process_image(file, 30, 14)
 
         # Increment the image count
         image_count = ImageCount.query.first()
@@ -86,8 +82,8 @@ def upload_file():
     return render_template('upload.html', total_visitors=total_visitors, total_images=total_images)
 
 
-def process_image(input_image, output_width, output_height):
-    img = Image.open(input_image)
+def process_image(file, output_width, output_height):
+    img = Image.open(file)
     ret = '======PLACEHOLDER NAME======\\n'
 
     resized_img = img.resize((output_width, output_height), Image.Resampling.LANCZOS)
