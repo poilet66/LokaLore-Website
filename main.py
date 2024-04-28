@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, session, redirect, url_for
+from flask.cli import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 import os
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY')  # Set a secret key for session handling
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///visitors.db'  # Configure the database URI
+app.secret_key = os.getenv('SECRET_KEY')  # Set a secret key for session handling
 db = SQLAlchemy(app)
 
 # Configure the upload directory
